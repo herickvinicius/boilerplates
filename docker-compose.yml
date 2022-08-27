@@ -3,65 +3,25 @@ version: "3.1"
 networks:
   internal-only-network:
     driver: bridge
-  proxied-network:
-    driver: bridge
-
 
 services:
-  database:
-    image: mongo:latest
-    container_name: mongodb
-    networks:
-      - internal-only-network
-    ports:
-      - 127.0.0.1:27017:27017
-    volumes:
-      - /database/data/db:/data/db
-    env_file:
-      - database/.env
-    environment:
-      MONGO_INITDB_DATABASE: $MONGO_DATABASE
-      MONGO_INITDB_ROOT_USERNAME: $MONGO_USERNAME
-      MONGO_INITDB_ROOT_PASSWORD: $MONGO_PASSWORD
-
+  #######################################
   backend:
     build: ./backend
     container_name: nodejs
-    
     # Data
     env_file:
       - backend/.env
-    working_dir: /usr/src/app
+    # working_dir: /app
     volumes:
-      - ./backend:/usr/src/app
-
-    # Do I need this????
+      - ./backend/src:/app/src
+    # Run
     command: npm run dev
-    # command: npm run start
-
     # Connectivity
-    links:
-      - database
-    networks:
-      - internal-only-network
+    # networks:
+    #   - internal-only-network
     ports:
       - 127.0.0.1:4000:4000
-
     # Misc
-    depends_on:
-      - database
-  
-  frontend:
-    build: ./frontend
-    container_name: vuejs
-
-    # Data
-    env_file:
-      - frontend/.env
-    working_dir: /usr/src/app
-    volumes:
-      - ./frontend:.
-    
-    command: npm run serve
-
-    
+    # depends_on:
+    #   - database
